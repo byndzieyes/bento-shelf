@@ -31,10 +31,7 @@ model Widget {
   userId    String
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  x         Int
-  y         Int
-  w         Int
-  h         Int
+  layoutData Json @default("{}")
 
   type      WidgetType
   content   Json

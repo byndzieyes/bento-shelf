@@ -1,42 +1,56 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Responsive } from 'react-grid-layout';
-import { WidthProvider } from 'react-grid-layout';
+import { Responsive, WidthProvider } from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
-// Define Layouts type locally to avoid import issues from @types
-type Layouts = { [breakpoint: string]: Layout[] };
 import { updateWidgetsLayout } from '@/app/actions';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
+// Define Layouts type locally to avoid import issues from @types
+type Layouts = { [breakpoint: string]: Layout[] };
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
+// This represents the layout data for a widget as stored in the database.
+// It's a map from breakpoint names (e.g., 'lg', 'md') to their positions.
+type WidgetLayoutData = Record<string, Pick<Layout, 'x' | 'y' | 'w' | 'h'>>;
 
 interface Widget {
   id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
   type: string;
+  layoutData: unknown;
 }
 
 interface BentoGridProps {
   initialWidgets: Widget[];
   isOwner: boolean;
+  isEditing: boolean;
   username: string;
 }
 
-export default function BentoGrid({ initialWidgets, isOwner, username }: BentoGridProps) {
-  const [layouts, setLayouts] = useState<Layouts>({
-    lg: initialWidgets.map((w) => ({
-      i: w.id.toString(),
-      x: w.x,
-      y: w.y,
-      w: w.w,
-      h: w.h,
-    })),
+function isWidgetLayoutData(data: unknown): data is WidgetLayoutData {
+  return data != null && typeof data === 'object' && !Array.isArray(data);
+}
+
+export default function BentoGrid({ initialWidgets, isOwner, isEditing, username }: BentoGridProps) {
+  const [layouts, setLayouts] = useState<Layouts>(() => {
+    const initialLayouts: Layouts = {};
+
+    initialWidgets.forEach((w) => {
+      const layoutData = isWidgetLayoutData(w.layoutData) ? w.layoutData : { lg: { x: 0, y: 0, w: 1, h: 1 } };
+
+      Object.entries(layoutData).forEach(([bp, pos]) => {
+        if (!initialLayouts[bp]) initialLayouts[bp] = [];
+        initialLayouts[bp].push({
+          i: w.id.toString(),
+          ...pos,
+        });
+      });
+    });
+
+    return initialLayouts;
   });
 
   const [isPending, startTransition] = useTransition();
@@ -47,15 +61,19 @@ export default function BentoGrid({ initialWidgets, isOwner, username }: BentoGr
     if (!isOwner) return;
 
     startTransition(async () => {
-      const sanitizedLayout = layout.map((item) => ({
-        i: item.i,
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-      }));
+      const sanitizedAllLayouts: Layouts = {};
+      for (const [bp, items] of Object.entries(allLayouts)) {
+        sanitizedAllLayouts[bp] = items.map((item) => ({
+          i: item.i,
+          x: item.x,
+          y: item.y,
+          w: item.w,
+          h: item.h,
+        }));
+      }
+
       try {
-        await updateWidgetsLayout(username, sanitizedLayout);
+        await updateWidgetsLayout(username, sanitizedAllLayouts);
         console.log('Layout saved successfully!');
       } catch (err) {
         console.error('Error saving layout:', err);
@@ -65,24 +83,25 @@ export default function BentoGrid({ initialWidgets, isOwner, username }: BentoGr
 
   return (
     <ResponsiveGridLayout
-      className={`layout transition-opacity ${isPending ? 'opacity-50 cursor-wait' : ''}`}
+      className={`layout transition-opacity ${isPending ? 'opacity-50 cursor-wait' : ''} ${isEditing ? 'editing' : ''}`}
       layouts={layouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       cols={{ lg: 4, md: 4, sm: 2, xs: 1, xxs: 1 }}
       rowHeight={180}
       margin={[20, 20]}
-      isDraggable={isOwner && !isPending}
-      isResizable={isOwner && !isPending}
+      isDraggable={isOwner && isEditing && !isPending}
+      isResizable={isOwner && isEditing && !isPending}
       draggableHandle=".drag-handle"
+      resizeHandles={['se']}
       onLayoutChange={handleLayoutChange}
     >
       {initialWidgets.map((widget) => (
         <div
           key={widget.id.toString()}
-          className="bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-6 flex flex-col group transition-colors hover:border-neutral-700"
+          className="bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-6 flex flex-col transition-colors"
         >
-          {isOwner && (
-            <div className="drag-handle absolute top-6 left-6 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity text-neutral-600 hover:text-white">
+          {isEditing && (
+            <div className="drag-handle absolute top-4 left-4 cursor-grab text-neutral-500 hover:text-white transition-colors p-2 text-2xl leading-none">
               ⠿
             </div>
           )}

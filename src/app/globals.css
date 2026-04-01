@@ -1,1 +1,41 @@
 @import 'tailwindcss';
+
+/* hide editing elements by default */
+.layout .drag-handle,
+.layout .react-resizable-handle {
+  display: none;
+}
+
+/* show them only in edit mode */
+.layout.editing .drag-handle {
+  display: block;
+}
+
+.layout.editing .react-grid-item > .react-resizable-handle {
+  display: block;
+  width: 40px !important;
+  height: 40px !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  padding: 0;
+  z-index: 20; /* make sure it's on top */
+}
+
+/* Add our icon to the actual resize handle */
+.react-grid-item > .react-resizable-handle::before {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 24px;
+  height: 24px;
+  background-color: #737373;
+  -webkit-mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M20.25 20.25v-4.5m0 4.5h-4.5m4.5 0L15 15' /%3e%3c/svg%3e");
+  mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M20.25 20.25v-4.5m0 4.5h-4.5m4.5 0L15 15' /%3e%3c/svg%3e");
+  transition: background-color 150ms;
+  cursor: se-resize;
+}
+
+.react-grid-item > .react-resizable-handle:hover::before {
+  background-color: #ffffff;
+}
