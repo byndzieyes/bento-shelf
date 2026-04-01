@@ -2,11 +2,10 @@
 
 import { useState, useTransition } from 'react';
 import { Responsive } from 'react-grid-layout';
-// @ts-expect-error - TS incorrectly misses WidthProvider in v1 types
 import { WidthProvider } from 'react-grid-layout';
 import type { Layout } from 'react-grid-layout';
 // Define Layouts type locally to avoid import issues from @types
-type Layouts = { [breakpoint: string]: Layout };
+type Layouts = { [breakpoint: string]: Layout[] };
 import { updateWidgetsLayout } from '@/app/actions';
 
 import 'react-grid-layout/css/styles.css';
@@ -42,7 +41,7 @@ export default function BentoGrid({ initialWidgets, isOwner, username }: BentoGr
 
   const [isPending, startTransition] = useTransition();
 
-  const handleLayoutChange = (layout: Layout, allLayouts: Layouts) => {
+  const handleLayoutChange = (layout: Layout[], allLayouts: Layouts) => {
     setLayouts(allLayouts);
 
     if (!isOwner) return;
@@ -66,14 +65,14 @@ export default function BentoGrid({ initialWidgets, isOwner, username }: BentoGr
 
   return (
     <ResponsiveGridLayout
-      className="layout"
+      className={`layout transition-opacity ${isPending ? 'opacity-50 cursor-wait' : ''}`}
       layouts={layouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       cols={{ lg: 4, md: 4, sm: 2, xs: 1, xxs: 1 }}
       rowHeight={180}
       margin={[20, 20]}
-      isDraggable={isOwner}
-      isResizable={isOwner}
+      isDraggable={isOwner && !isPending}
+      isResizable={isOwner && !isPending}
       draggableHandle=".drag-handle"
       onLayoutChange={handleLayoutChange}
     >
