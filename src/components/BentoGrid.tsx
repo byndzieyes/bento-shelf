@@ -2,33 +2,14 @@
 
 import { useState, useTransition } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import type { Layout } from 'react-grid-layout';
 import { updateWidgetsLayout } from '@/app/actions';
+import WidgetRenderer from './widgets/WidgetRenderer';
+import type { Layouts, WidgetLayoutData, BentoGridProps, Layout } from '@/types';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
-// Define Layouts type locally to avoid import issues from @types
-type Layouts = { [breakpoint: string]: Layout[] };
-
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
-// This represents the layout data for a widget as stored in the database.
-// It's a map from breakpoint names (e.g., 'lg', 'md') to their positions.
-type WidgetLayoutData = Record<string, Pick<Layout, 'x' | 'y' | 'w' | 'h'>>;
-
-interface Widget {
-  id: string;
-  type: string;
-  layoutData: unknown;
-}
-
-interface BentoGridProps {
-  initialWidgets: Widget[];
-  isOwner: boolean;
-  isEditing: boolean;
-  username: string;
-}
 
 function isWidgetLayoutData(data: unknown): data is WidgetLayoutData {
   return data != null && typeof data === 'object' && !Array.isArray(data);
@@ -98,18 +79,15 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
       {initialWidgets.map((widget) => (
         <div
           key={widget.id.toString()}
-          className="bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-6 flex flex-col transition-colors"
+          className="bg-neutral-900 border border-neutral-800 rounded-[2.5rem] p-6 flex flex-col transition-colors overflow-hidden"
         >
           {isEditing && (
-            <div className="drag-handle absolute top-4 left-4 cursor-grab text-neutral-500 hover:text-white transition-colors p-2 text-2xl leading-none">
+            <div className="drag-handle absolute top-4 left-4 cursor-grab text-white/50 hover:text-white transition-colors p-2 text-2xl leading-none z-20 bg-black/50 rounded-full backdrop-blur-sm">
               ⠿
             </div>
           )}
 
-          <div className="mt-auto">
-            <h3 className="text-neutral-500 text-sm font-medium uppercase tracking-wider">{widget.type}</h3>
-            <p className="text-white font-semibold mt-1">Here will be the content</p>
-          </div>
+          <WidgetRenderer widget={widget} />
         </div>
       ))}
     </ResponsiveGridLayout>

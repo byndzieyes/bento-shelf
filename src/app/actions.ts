@@ -3,14 +3,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
-
-interface LayoutItem {
-  i: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
+import type { TMDBMovie, LayoutItem } from '@/types';
 
 export async function updateWidgetsLayout(username: string, allLayouts: Record<string, LayoutItem[]>) {
   const { userId: clerkId } = await auth();
@@ -63,5 +56,42 @@ export async function updateWidgetsLayout(username: string, allLayouts: Record<s
   } catch (error) {
     console.error('Failed to update layout:', error);
     throw new Error('An error occurred while saving the layout.');
+  }
+}
+
+export async function addMovieWidget(username: string, movie: TMDBMovie) {
+  const { userId: clerkId } = await auth();
+  if (!clerkId) throw new Error('Unauthorized');
+
+  const user = await prisma.user.findUnique({
+    where: { clerkId },
+    select: { id: true },
+  });
+
+  if (!user) throw new Error('User not found.');
+
+  try {
+    await prisma.widget.create({
+      data: {
+        userId: user.id,
+        type: 'MOVIE',
+        layoutData: {
+          lg: { x: 0, y: 0, w: 2, h: 2 },
+          md: { x: 0, y: 0, w: 2, h: 2 },
+          sm: { x: 0, y: 0, w: 2, h: 2 },
+        },
+        content: {
+          tmdbId: movie.id,
+          title: movie.title,
+          posterPath: movie.poster_path,
+          releaseDate: movie.release_date,
+        },
+      },
+    });
+
+    revalidatePath(`/${username}`);
+  } catch (error) {
+    console.error('Failed to add movie widget:', error);
+    throw new Error('Could not add widget');
   }
 }

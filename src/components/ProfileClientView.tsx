@@ -2,12 +2,7 @@
 
 import { useState } from 'react';
 import BentoGrid from '@/components/BentoGrid';
-import type { User, Widget } from '@prisma/client';
-
-interface ProfileClientViewProps {
-  profileOwner: User & { widgets: Widget[] };
-  isOwner: boolean;
-}
+import type { ProfileClientViewProps } from '@/types';
 
 export default function ProfileClientView({ profileOwner, isOwner }: ProfileClientViewProps) {
   const [isEditing, setIsEditing] = useState(false);
