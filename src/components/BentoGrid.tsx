@@ -15,6 +15,14 @@ function isWidgetLayoutData(data: unknown): data is WidgetLayoutData {
   return data != null && typeof data === 'object' && !Array.isArray(data);
 }
 
+function getStableLayoutString(layouts: Layouts): string {
+  const stable: Layouts = {};
+  for (const bp of Object.keys(layouts).sort()) {
+    stable[bp] = layouts[bp].map(({ i, x, y, w, h }) => ({ i, x, y, w, h })).sort((a, b) => a.i.localeCompare(b.i));
+  }
+  return JSON.stringify(stable);
+}
+
 export default function BentoGrid({ initialWidgets, isOwner, isEditing, username }: BentoGridProps) {
   const [layouts, setLayouts] = useState<Layouts>(() => {
     const initialLayouts: Layouts = {};
@@ -35,24 +43,24 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
   });
 
   const [isPending, startTransition] = useTransition();
+  const [lastSavedLayout, setLastSavedLayout] = useState<string>(() => getStableLayoutString(layouts));
 
   const handleLayoutChange = (layout: Layout[], allLayouts: Layouts) => {
     setLayouts(allLayouts);
 
-    if (!isOwner) return;
+    if (!isOwner || !isEditing) return;
+
+    const newLayoutString = getStableLayoutString(allLayouts);
+    if (newLayoutString === lastSavedLayout) return;
+
+    setLastSavedLayout(newLayoutString);
+
+    const sanitizedAllLayouts: Layouts = {};
+    for (const [bp, items] of Object.entries(allLayouts)) {
+      sanitizedAllLayouts[bp] = items.map(({ i, x, y, w, h }) => ({ i, x, y, w, h }));
+    }
 
     startTransition(async () => {
-      const sanitizedAllLayouts: Layouts = {};
-      for (const [bp, items] of Object.entries(allLayouts)) {
-        sanitizedAllLayouts[bp] = items.map((item) => ({
-          i: item.i,
-          x: item.x,
-          y: item.y,
-          w: item.w,
-          h: item.h,
-        }));
-      }
-
       try {
         await updateWidgetsLayout(username, sanitizedAllLayouts);
         console.log('Layout saved successfully!');
@@ -64,14 +72,14 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
 
   return (
     <ResponsiveGridLayout
-      className={`layout transition-opacity ${isPending ? 'opacity-50 cursor-wait' : ''} ${isEditing ? 'editing' : ''}`}
+      className={`layout transition-opacity ${isPending ? 'opacity-50 cursor-wait pointer-events-none' : ''} ${isEditing ? 'editing' : ''}`}
       layouts={layouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       cols={{ lg: 4, md: 4, sm: 2, xs: 1, xxs: 1 }}
       rowHeight={180}
       margin={[20, 20]}
-      isDraggable={isOwner && isEditing && !isPending}
-      isResizable={isOwner && isEditing && !isPending}
+      isDraggable={isOwner && isEditing}
+      isResizable={isOwner && isEditing}
       draggableHandle=".drag-handle"
       resizeHandles={['se']}
       onLayoutChange={handleLayoutChange}

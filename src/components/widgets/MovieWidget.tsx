@@ -18,6 +18,7 @@ export default function MovieWidget({ content }: MovieWidgetProps) {
         alt={content.title || 'Movie Poster'}
         fill
         unoptimized
+        priority
         className="object-cover rounded-[2.5rem] opacity-70 pointer-events-none"
         draggable={false}
       />
