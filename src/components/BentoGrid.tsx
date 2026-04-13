@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { updateWidgetsLayout } from '@/app/actions';
+import { updateWidgetsLayout, deleteWidget } from '@/actions/widget';
 import WidgetRenderer from './widgets/WidgetRenderer';
 import type { Layouts, WidgetLayoutData, BentoGridProps, Layout } from '@/types';
 
@@ -70,6 +70,18 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
     });
   };
 
+  const handleDeleteWidget = async (widgetId: string) => {
+    if (!window.confirm('Are you sure you want to delete the widget?')) return;
+
+    startTransition(async () => {
+      try {
+        await deleteWidget(widgetId, username);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+
   return (
     <ResponsiveGridLayout
       className={`layout transition-opacity ${isPending ? 'opacity-50 cursor-wait pointer-events-none' : ''} ${isEditing ? 'editing' : ''}`}
@@ -93,6 +105,17 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
             <div className="drag-handle absolute top-4 left-4 cursor-grab text-white/50 hover:text-white transition-colors p-2 text-2xl leading-none z-20 bg-black/50 rounded-full backdrop-blur-sm">
               ⠿
             </div>
+          )}
+
+          {isEditing && (
+            <button
+              onClick={() => handleDeleteWidget(widget.id)}
+              disabled={isPending}
+              className="absolute top-4 right-4 z-20 bg-red-500/80 hover:bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors shadow-lg disabled:opacity-50"
+              title="Delete Widget"
+            >
+              ✕
+            </button>
           )}
 
           <WidgetRenderer widget={widget} />

@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import { searchMovies } from '@/lib/tmdb';
-import { addMovieWidget } from '@/app/actions';
+import { addMovieWidget } from '@/actions/widget';
 import type { TMDBMovie, MovieSearchSelectorProps } from '@/types';
 
 export default function MovieSearchSelector({ username, onSuccess }: MovieSearchSelectorProps) {
