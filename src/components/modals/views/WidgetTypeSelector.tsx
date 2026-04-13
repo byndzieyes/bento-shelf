@@ -1,23 +1,10 @@
 'use client';
 
-import type { WidgetTypeSelectorProps, WidgetTypeConfig } from '@/types';
+import type { WidgetTypeSelectorProps } from '@/types';
+import { WIDGET_CONFIG } from '@/config/widgets';
 
 export default function WidgetTypeSelector({ onSelect }: WidgetTypeSelectorProps) {
-  const types: WidgetTypeConfig[] = [
-    {
-      id: 'MOVIE',
-      label: 'Movie',
-      icon: '🎬',
-      color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-    },
-    { id: 'MUSIC', label: 'Music', icon: '🎵', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-    {
-      id: 'CUSTOM_TEXT',
-      label: 'Custom Text',
-      icon: '📝',
-      color: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    },
-  ];
+  const types = Object.values(WIDGET_CONFIG);
 
   return (
     <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">

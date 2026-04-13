@@ -3,11 +3,22 @@
 import { useState } from 'react';
 import BentoGrid from '@/components/BentoGrid';
 import AddWidgetModal from '@/components/modals/AddWidgetModal';
-import type { ProfileClientViewProps } from '@/types';
+import type { ProfileClientViewProps, WidgetType } from '@/types';
 
 export default function ProfileClientView({ profileOwner, isOwner }: ProfileClientViewProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [editTarget, setEditTarget] = useState<{ id: string; type: WidgetType } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEditWidget = (widgetId: string, widgetType: WidgetType) => {
+    setEditTarget({ id: widgetId, type: widgetType });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditTarget(null);
+  };
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white p-6 md:p-12">
@@ -48,10 +59,16 @@ export default function ProfileClientView({ profileOwner, isOwner }: ProfileClie
           isOwner={isOwner}
           isEditing={isEditing}
           username={profileOwner.username}
+          onEditWidget={handleEditWidget}
         />
       </div>
 
-      <AddWidgetModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} username={profileOwner.username} />
+      <AddWidgetModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        username={profileOwner.username}
+        editTarget={editTarget}
+      />
     </main>
   );
 }

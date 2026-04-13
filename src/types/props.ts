@@ -1,5 +1,5 @@
 import type { Widget } from '@prisma/client';
-import type { MovieContent } from './tmdb';
+import type { MovieContent } from './widget';
 import type { ProfileOwnerWithWidgets } from './profile';
 import type { WidgetType } from './widget';
 
@@ -8,12 +8,16 @@ export interface BentoGridProps {
   isOwner: boolean;
   isEditing: boolean;
   username: string;
+  onEditWidget?: (widgetId: string, type: WidgetType) => void;
 }
 
-export interface MovieSearchSelectorProps {
+export interface BaseWidgetViewProps {
   username: string;
   onSuccess: () => void;
+  editTarget?: { id: string; type: WidgetType } | null;
 }
+
+export type MovieSearchSelectorProps = BaseWidgetViewProps;
 
 export interface WidgetTypeSelectorProps {
   onSelect: (type: WidgetType) => void;
@@ -36,4 +40,5 @@ export interface AddWidgetModalProps {
   isOpen: boolean;
   onClose: () => void;
   username: string;
+  editTarget?: { id: string; type: WidgetType } | null;
 }

@@ -3,24 +3,25 @@
 import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import { searchMovies } from '@/lib/tmdb';
-import { addMovieWidget } from '@/actions/widget';
+import { addMovieWidget, updateWidgetContent } from '@/actions/widget';
 import type { TMDBMovie, MovieSearchSelectorProps } from '@/types';
 
-export default function MovieSearchSelector({ username, onSuccess }: MovieSearchSelectorProps) {
+export default function MovieSearchSelector({ username, onSuccess, editTarget }: MovieSearchSelectorProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TMDBMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const debounceId = setTimeout(async () => {
-      if (!query.trim()) {
-        setResults([]);
-        setIsSearching(false);
-        return;
-      }
-
+    if (query.trim()) {
       setIsSearching(true);
+    } else {
+      setResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    const debounceId = setTimeout(async () => {
       try {
         const movies = await searchMovies(query);
         setResults(movies);
@@ -34,13 +35,22 @@ export default function MovieSearchSelector({ username, onSuccess }: MovieSearch
     return () => clearTimeout(debounceId);
   }, [query]);
 
-  const handleAdd = (movie: TMDBMovie) => {
+  const handleAction = (movie: TMDBMovie) => {
     startTransition(async () => {
       try {
-        await addMovieWidget(username, movie);
+        if (editTarget) {
+          await updateWidgetContent(editTarget.id, username, {
+            tmdbId: movie.id,
+            title: movie.title,
+            posterPath: movie.poster_path ?? undefined,
+            releaseDate: movie.release_date ?? undefined,
+          });
+        } else {
+          await addMovieWidget(username, movie);
+        }
         onSuccess();
       } catch (err) {
-        alert('Error adding movie');
+        alert(`Error ${editTarget ? 'updating' : 'adding'} movie`);
         console.error(err);
       }
     });
@@ -80,7 +90,7 @@ export default function MovieSearchSelector({ username, onSuccess }: MovieSearch
               <button
                 key={movie.id}
                 disabled={isPending}
-                onClick={() => handleAdd(movie)}
+                onClick={() => handleAction(movie)}
                 className="group relative block w-full pt-[150%] rounded-2xl overflow-hidden bg-neutral-800 border border-neutral-700 hover:border-indigo-500 transition-all disabled:opacity-50 active:scale-95"
               >
                 {movie.poster_path ? (

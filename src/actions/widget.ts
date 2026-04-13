@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { requireUser } from '@/lib/server-utils';
-import type { TMDBMovie, LayoutItem } from '@/types';
+import type { TMDBMovie, LayoutItem, WidgetContentData } from '@/types';
+import { InputJsonValue } from '@prisma/client/runtime/client';
 
 export async function updateWidgetsLayout(username: string, allLayouts: Record<string, LayoutItem[]>) {
   const user = await requireUser();
@@ -59,6 +60,27 @@ export async function addMovieWidget(username: string, movie: TMDBMovie) {
   } catch (error) {
     console.error('Failed to add movie widget:', error);
     throw new Error('Could not add widget');
+  }
+}
+
+export async function updateWidgetContent(widgetId: string, username: string, newContent: WidgetContentData) {
+  const user = await requireUser();
+
+  try {
+    await prisma.widget.update({
+      where: {
+        id: widgetId,
+        userId: user.id,
+      },
+      data: {
+        content: newContent as InputJsonValue,
+      },
+    });
+
+    revalidatePath(`/${username}`);
+  } catch (error) {
+    console.error('Failed to update widget content:', error);
+    throw new Error('Could not update widget content');
   }
 }
 
