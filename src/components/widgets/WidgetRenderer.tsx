@@ -1,18 +1,14 @@
 import MovieWidget from './MovieWidget';
-import type { MovieContent, WidgetRendererProps } from '@/types';
+import type { CustomTextContent, MovieContent, WidgetRendererProps } from '@/types';
+import CustomTextWidget from './CustomTextWidget';
 
 export default function WidgetRenderer({ widget, w, h }: WidgetRendererProps) {
   switch (widget.type) {
     case 'MOVIE':
       return <MovieWidget content={widget.content as MovieContent} w={w} h={h} />;
 
-    case 'MUSIC':
-      // return <MusicWidget content={widget.content} />;
-      return <div className="mt-auto text-neutral-500 font-medium">🎵 Music Widget</div>;
-
     case 'CUSTOM_TEXT':
-      // return <CustomTextWidget content={widget.content} />;
-      return <div className="mt-auto text-neutral-500 font-medium">📝 Custom Text</div>;
+      return <CustomTextWidget content={widget.content as unknown as CustomTextContent} w={w} h={h} />;
 
     default:
       return (

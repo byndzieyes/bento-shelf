@@ -9,4 +9,10 @@ export interface MovieContent {
   releaseDate?: string;
 }
 
-export type WidgetContentData = MovieContent; // | MusicContent | CustomTextContent;
+export interface CustomTextContent {
+  text: string;
+}
+
+export type WidgetContentData = MovieContent | CustomTextContent; // | MusicContent;
+
+export type { Widget } from '@prisma/client';

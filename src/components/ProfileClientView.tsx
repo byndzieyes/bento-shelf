@@ -3,16 +3,19 @@
 import { useState } from 'react';
 import BentoGrid from '@/components/BentoGrid';
 import AddWidgetModal from '@/components/modals/AddWidgetModal';
-import type { ProfileClientViewProps, WidgetType } from '@/types';
+import type { ProfileClientViewProps, Widget } from '@/types';
 
 export default function ProfileClientView({ profileOwner, isOwner }: ProfileClientViewProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editTarget, setEditTarget] = useState<{ id: string; type: WidgetType } | null>(null);
+  const [editTarget, setEditTarget] = useState<Widget | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleEditWidget = (widgetId: string, widgetType: WidgetType) => {
-    setEditTarget({ id: widgetId, type: widgetType });
-    setIsModalOpen(true);
+  const handleEditWidget = (widgetId: string) => {
+    const widgetToEdit = profileOwner.widgets.find((w) => w.id === widgetId);
+    if (widgetToEdit) {
+      setEditTarget(widgetToEdit);
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {

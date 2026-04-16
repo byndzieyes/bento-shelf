@@ -48,7 +48,14 @@ export default function AddWidgetModal({ isOpen, onClose, username, editTarget }
           {step === 'TYPE' ? (
             <WidgetTypeSelector onSelect={setSelectedType} />
           ) : (
-            ActiveView && <ActiveView username={username} onSuccess={handleClose} editTarget={editTarget} />
+            ActiveView && (
+              <ActiveView
+                key={editTarget?.id || 'new'}
+                username={username}
+                onSuccess={handleClose}
+                editTarget={editTarget}
+              />
+            )
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import type { WidgetType, BaseWidgetViewProps } from '@/types';
 import MovieSearchSelector from '@/components/modals/views/MovieSearchSelector';
+import CustomTextSelector from '@/components/modals/views/CustomTextSelector';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -33,6 +34,6 @@ export const WIDGET_CONFIG: Record<WidgetType, WidgetConfig> = {
     icon: '📝',
     color: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
     title: 'Configure text',
-    component: () => <div className="p-10 text-center text-neutral-500">Custom Text configuration coming soon...</div>,
+    component: CustomTextSelector,
   },
 };

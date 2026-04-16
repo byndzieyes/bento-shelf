@@ -63,6 +63,30 @@ export async function addMovieWidget(username: string, movie: TMDBMovie) {
   }
 }
 
+export async function addCustomTextWidget(username: string, text: string) {
+  const user = await requireUser();
+
+  try {
+    await prisma.widget.create({
+      data: {
+        userId: user.id,
+        type: 'CUSTOM_TEXT',
+        layoutData: {
+          lg: { x: 0, y: 0, w: 2, h: 1 },
+          md: { x: 0, y: 0, w: 2, h: 1 },
+          sm: { x: 0, y: 0, w: 2, h: 1 },
+        },
+        content: { text },
+      },
+    });
+
+    revalidatePath(`/${username}`);
+  } catch (error) {
+    console.error('Failed to add custom text widget:', error);
+    throw new Error('Could not add widget');
+  }
+}
+
 export async function updateWidgetContent(widgetId: string, username: string, newContent: WidgetContentData) {
   const user = await requireUser();
 

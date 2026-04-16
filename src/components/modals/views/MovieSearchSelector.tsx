@@ -4,10 +4,10 @@ import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import { searchMovies } from '@/lib/tmdb';
 import { addMovieWidget, updateWidgetContent } from '@/actions/widget';
-import type { TMDBMovie, MovieSearchSelectorProps } from '@/types';
+import type { TMDBMovie, MovieSearchSelectorProps, MovieContent } from '@/types';
 
 export default function MovieSearchSelector({ username, onSuccess, editTarget }: MovieSearchSelectorProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(() => (editTarget?.content as MovieContent)?.title ?? '');
   const [results, setResults] = useState<TMDBMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isPending, startTransition] = useTransition();
