@@ -54,13 +54,28 @@ export default function ProfileClientView({ profileOwner, isOwner }: ProfileClie
       </header>
 
       <div className="max-w-6xl mx-auto">
-        <BentoGrid
-          initialWidgets={profileOwner.widgets}
-          isOwner={isOwner}
-          isEditing={isEditing}
-          username={profileOwner.username}
-          onEditWidget={handleEditWidget}
-        />
+        {profileOwner.widgets.length === 0 ? (
+          <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-neutral-800 bg-neutral-900/50 py-12 text-center">
+            <h2 className="mt-6 text-2xl font-bold text-white">Shelf is empty</h2>
+            <p className="mt-2 text-neutral-500">Add your first widget to start building your collection</p>
+            {isOwner && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="mt-8 rounded-full bg-white px-6 py-3 text-base font-bold text-black shadow-lg shadow-white/10 transition-all hover:bg-neutral-200 active:scale-95"
+              >
+                Add Widget
+              </button>
+            )}
+          </div>
+        ) : (
+          <BentoGrid
+            initialWidgets={profileOwner.widgets}
+            isOwner={isOwner}
+            isEditing={isEditing}
+            username={profileOwner.username}
+            onEditWidget={handleEditWidget}
+          />
+        )}
       </div>
 
       <AddWidgetModal
