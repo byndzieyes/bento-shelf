@@ -1,10 +1,10 @@
 import MovieWidget from './MovieWidget';
 import type { MovieContent, WidgetRendererProps } from '@/types';
 
-export default function WidgetRenderer({ widget }: WidgetRendererProps) {
+export default function WidgetRenderer({ widget, w, h }: WidgetRendererProps) {
   switch (widget.type) {
     case 'MOVIE':
-      return <MovieWidget content={widget.content as MovieContent} />;
+      return <MovieWidget content={widget.content as MovieContent} w={w} h={h} />;
 
     case 'MUSIC':
       // return <MusicWidget content={widget.content} />;

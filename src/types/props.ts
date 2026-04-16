@@ -30,10 +30,14 @@ export interface ProfileClientViewProps {
 
 export interface MovieWidgetProps {
   content: MovieContent;
+  w: number;
+  h: number;
 }
 
 export interface WidgetRendererProps {
   widget: Widget;
+  w: number;
+  h: number;
 }
 
 export interface AddWidgetModalProps {

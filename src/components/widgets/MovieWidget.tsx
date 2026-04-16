@@ -1,12 +1,55 @@
 import type { MovieWidgetProps } from '@/types';
 import Image from 'next/image';
 
-export default function MovieWidget({ content }: MovieWidgetProps) {
+export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
   if (!content || !content.posterPath) {
     return (
-      <div className="mt-auto flex flex-col items-center justify-center h-full text-center">
-        <span className="text-4xl mb-2">🎬</span>
-        <p className="text-neutral-500 text-sm font-medium">Select a movie...</p>
+      <div className="flex h-full flex-col items-center justify-center text-center">
+        <span className="mb-2 text-4xl">🎬</span>
+        <p className="text-sm font-medium text-neutral-500">Select a movie...</p>
+      </div>
+    );
+  }
+
+  const releaseYear = content.releaseDate?.slice(0, 4);
+
+  if (w === 1 && h === 1) {
+    return (
+      <Image
+        src={`https://image.tmdb.org/t/p/w300${content.posterPath}`}
+        alt={content.title || 'Movie Poster'}
+        fill
+        unoptimized
+        priority
+        className="object-cover"
+        draggable={false}
+      />
+    );
+  }
+
+  if (w >= 3 && h <= 2) {
+    return (
+      <div className="absolute inset-0 flex h-full w-full bg-neutral-900 overflow-hidden">
+        <div className="relative h-full w-[45%]">
+          <Image
+            src={`https://image.tmdb.org/t/p/w500${content.posterPath}`}
+            alt={content.title || 'Movie Poster'}
+            fill
+            unoptimized
+            priority
+            className="object-cover"
+            draggable={false}
+          />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-linear-to-r from-transparent to-neutral-900" />
+        </div>
+
+        <div className="relative z-10 flex h-full w-[55%] flex-col justify-center px-8">
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-400">MOVIE</h3>
+          </div>
+          <p className="text-2xl font-bold leading-tight text-white line-clamp-2 drop-shadow-md">{content.title}</p>
+          {releaseYear && <p className="mt-2 text-sm font-medium text-neutral-400">{releaseYear}</p>}
+        </div>
       </div>
     );
   }
@@ -19,15 +62,14 @@ export default function MovieWidget({ content }: MovieWidgetProps) {
         fill
         unoptimized
         priority
-        className="object-cover rounded-[2.5rem] opacity-70 pointer-events-none"
+        className="pointer-events-none object-cover opacity-70"
         draggable={false}
       />
-
-      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent rounded-[2.5rem] pointer-events-none" />
-
-      <div className="relative mt-auto z-10 p-2">
-        <h3 className="text-white/70 text-xs font-bold uppercase tracking-widest mb-1 drop-shadow-md">Movie</h3>
-        <p className="text-white font-bold text-xl leading-tight drop-shadow-lg">{content.title}</p>
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+      <div className="relative z-10 mt-auto p-4 md:p-6">
+        <h3 className="mb-1 text-xs font-bold uppercase tracking-widest text-white/70 drop-shadow-md">Movie</h3>
+        <p className="text-xl font-bold leading-tight text-white drop-shadow-lg md:text-2xl">{content.title}</p>
+        {releaseYear && <p className="mt-1 text-sm font-medium text-neutral-300 drop-shadow-lg">{releaseYear}</p>}
       </div>
     </>
   );
