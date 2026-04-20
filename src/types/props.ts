@@ -50,3 +50,9 @@ export interface AddWidgetModalProps {
   username: string;
   editTarget?: Widget | null;
 }
+
+export interface EditProfileModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  profile: ProfileOwnerWithWidgets;
+}
