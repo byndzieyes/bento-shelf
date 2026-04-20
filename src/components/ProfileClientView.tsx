@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import BentoGrid from '@/components/BentoGrid';
 import AddWidgetModal from '@/components/modals/AddWidgetModal';
 import type { ProfileClientViewProps, Widget } from '@/types';
@@ -23,11 +24,60 @@ export default function ProfileClientView({ profileOwner, isOwner }: ProfileClie
     setEditTarget(null);
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({
+          title: `@${profileOwner.username}'s Shelf`,
+          url: url,
+        });
+        return;
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied to clipboard!');
+    } catch (clipboardError) {
+      toast.error('Failed to copy link');
+      console.error('Error copying link to clipboard:', clipboardError);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-neutral-950 text-white p-6 md:p-12">
       <header className="max-w-6xl mx-auto mb-12 flex justify-between items-end gap-4">
         <div className="flex-1">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white">@{profileOwner.username}</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white">@{profileOwner.username}</h1>
+            <button
+              onClick={handleShare}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 transition-all hover:text-white hover:border-neutral-700 active:scale-95 shadow-sm"
+              title="Share Profile"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                <polyline points="16 6 12 2 8 6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+            </button>
+          </div>
           <p className="text-neutral-500 mt-2 font-medium">Your personal shelf</p>
         </div>
 
