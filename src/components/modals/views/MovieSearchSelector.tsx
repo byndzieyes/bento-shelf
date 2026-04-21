@@ -7,6 +7,8 @@ import { searchMovies } from '@/lib/tmdb';
 import { addMovieWidget, updateWidgetContent } from '@/actions/widget';
 import type { TMDBMovie, MovieSearchSelectorProps, MovieContent } from '@/types';
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 export default function MovieSearchSelector({ username, onSuccess, editTarget }: MovieSearchSelectorProps) {
   const [query, setQuery] = useState(() => (editTarget?.content as MovieContent)?.title ?? '');
   const [results, setResults] = useState<TMDBMovie[]>([]);
@@ -78,9 +80,12 @@ export default function MovieSearchSelector({ username, onSuccess, editTarget }:
             <p className="font-medium text-sm">Type a movie name to search...</p>
           </div>
         ) : isSearching && results.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-neutral-500 space-y-4">
-            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-            <p className="font-medium text-sm">Searching for &quot;{query}&quot;...</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="relative w-full pt-[150%] rounded-2xl overflow-hidden bg-neutral-800 border border-neutral-700">
+                <Skeleton className="absolute inset-0" />
+              </div>
+            ))}
           </div>
         ) : results.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-neutral-500 space-y-3">

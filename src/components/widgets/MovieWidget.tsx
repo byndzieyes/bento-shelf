@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import type { MovieWidgetProps } from '@/types';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
+  const [isImageLoading, setIsImageLoading] = useState(true);
+
   if (!content || !content.posterPath) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-center">
@@ -15,15 +19,19 @@ export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
 
   if (w === 1 && h === 1) {
     return (
-      <Image
-        src={`https://image.tmdb.org/t/p/w300${content.posterPath}`}
-        alt={content.title || 'Movie Poster'}
-        fill
-        unoptimized
-        priority
-        className="object-cover"
-        draggable={false}
-      />
+      <>
+        {isImageLoading && <Skeleton className="absolute inset-0 z-10" />}
+        <Image
+          src={`https://image.tmdb.org/t/p/w300${content.posterPath}`}
+          alt={content.title || 'Movie Poster'}
+          fill
+          unoptimized
+          priority
+          className="object-cover"
+          draggable={false}
+          onLoad={() => setIsImageLoading(false)}
+        />
+      </>
     );
   }
 
@@ -31,6 +39,7 @@ export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
     return (
       <div className="absolute inset-0 flex h-full w-full bg-neutral-900 overflow-hidden">
         <div className="relative h-full w-[45%]">
+          {isImageLoading && <Skeleton className="absolute inset-0 z-10" />}
           <Image
             src={`https://image.tmdb.org/t/p/w500${content.posterPath}`}
             alt={content.title || 'Movie Poster'}
@@ -39,6 +48,7 @@ export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
             priority
             className="object-cover"
             draggable={false}
+            onLoad={() => setIsImageLoading(false)}
           />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-linear-to-r from-transparent to-neutral-900" />
         </div>
@@ -56,6 +66,7 @@ export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
 
   return (
     <>
+      {isImageLoading && <Skeleton className="absolute inset-0 z-20" />}
       <Image
         src={`https://image.tmdb.org/t/p/w500${content.posterPath}`}
         alt={content.title || 'Movie Poster'}
@@ -64,6 +75,7 @@ export default function MovieWidget({ content, w, h }: MovieWidgetProps) {
         priority
         className="pointer-events-none object-cover opacity-70"
         draggable={false}
+        onLoad={() => setIsImageLoading(false)}
       />
       <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
       <div className="relative z-10 mt-auto p-4 md:p-6">
