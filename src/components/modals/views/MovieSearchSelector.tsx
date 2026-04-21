@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
+import { toast } from 'sonner';
 import { searchMovies } from '@/lib/tmdb';
 import { addMovieWidget, updateWidgetContent } from '@/actions/widget';
 import type { TMDBMovie, MovieSearchSelectorProps, MovieContent } from '@/types';
@@ -45,12 +46,14 @@ export default function MovieSearchSelector({ username, onSuccess, editTarget }:
             posterPath: movie.poster_path ?? undefined,
             releaseDate: movie.release_date ?? undefined,
           });
+          toast.success('Movie widget updated!');
         } else {
           await addMovieWidget(username, movie);
+          toast.success('Movie added to shelf!');
         }
         onSuccess();
       } catch (err) {
-        alert(`Error ${editTarget ? 'updating' : 'adding'} movie`);
+        toast.error(`Failed to ${editTarget ? 'update' : 'add'} movie`);
         console.error(err);
       }
     });

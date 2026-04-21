@@ -189,7 +189,17 @@ export default function ProfileClientView({ profileOwner, isOwner }: ProfileClie
               )}
 
               <button
-                onClick={() => setIsEditing((prev) => !prev)}
+                onClick={() => {
+                  setIsEditing((prev) => {
+                    const next = !prev;
+                    if (next) {
+                      toast.info('Editing mode enabled', { id: 'edit-mode' });
+                    } else {
+                      toast.success('All changes saved!', { id: 'edit-mode' });
+                    }
+                    return next;
+                  });
+                }}
                 className={`px-5 py-2 rounded-full text-sm font-bold transition-all border active:scale-95 ${
                   isEditing
                     ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20'

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { addCustomTextWidget, updateWidgetContent } from '@/actions/widget';
 import type { BaseWidgetViewProps, CustomTextContent } from '@/types';
 
@@ -15,12 +16,14 @@ export default function CustomTextSelector({ username, onSuccess, editTarget }: 
       try {
         if (editTarget) {
           await updateWidgetContent(editTarget.id, username, { text });
+          toast.success('Text widget updated!');
         } else {
           await addCustomTextWidget(username, text);
+          toast.success('Text widget added!');
         }
         onSuccess();
       } catch (err) {
-        alert(`Error: Could not ${editTarget ? 'update' : 'add'} text widget.`);
+        toast.error(`Failed to ${editTarget ? 'update' : 'add'} text widget`);
         console.error(err);
       }
     });

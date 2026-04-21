@@ -5,6 +5,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import { updateWidgetsLayout, deleteWidget } from '@/actions/widget';
 import WidgetRenderer from './widgets/WidgetRenderer';
 import type { Layouts, WidgetLayoutData, BentoGridProps, Layout } from '@/types';
+import { toast } from 'sonner';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -61,25 +62,23 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
       sanitizedAllLayouts[bp] = items.map(({ i, x, y, w, h }) => ({ i, x, y, w, h }));
     }
 
-    startTransition(async () => {
-      try {
-        await updateWidgetsLayout(username, sanitizedAllLayouts);
-        console.log('Layout saved successfully!');
-      } catch (err) {
-        console.error('Error saving layout:', err);
-      }
+    startTransition(() => {
+      updateWidgetsLayout(username, sanitizedAllLayouts).catch((err) => {
+        toast.error('Failed to save layout.');
+        console.error(err);
+      });
     });
   };
 
-  const handleDeleteWidget = async (widgetId: string) => {
+  const handleDeleteWidget = (widgetId: string) => {
     if (!window.confirm('Are you sure you want to delete the widget?')) return;
 
-    startTransition(async () => {
-      try {
-        await deleteWidget(widgetId, username);
-      } catch (err) {
-        console.error(err);
-      }
+    startTransition(() => {
+      toast.promise(deleteWidget(widgetId, username), {
+        loading: 'Deleting widget...',
+        success: 'Widget deleted.',
+        error: 'Failed to delete widget.',
+      });
     });
   };
 
