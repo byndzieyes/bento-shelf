@@ -16,3 +16,10 @@ export interface CustomTextContent {
 export type WidgetContentData = MovieContent | CustomTextContent; // | MusicContent;
 
 export type { Widget } from '@prisma/client';
+
+export type ExtendedWidget = Widget & {
+  _count?: {
+    likes: number;
+  };
+  likes?: { id: string }[];
+};

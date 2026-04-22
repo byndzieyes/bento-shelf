@@ -2,7 +2,7 @@ import type { MovieContent, CustomTextContent, Widget, WidgetType } from './widg
 import type { ProfileOwnerWithWidgets } from './profile';
 
 export interface BentoGridProps {
-  initialWidgets: Widget[];
+  initialWidgets: ProfileOwnerWithWidgets['widgets'];
   isOwner: boolean;
   isEditing: boolean;
   username: string;
@@ -39,7 +39,7 @@ export interface CustomTextWidgetProps {
 }
 
 export interface WidgetRendererProps {
-  widget: Widget;
+  widget: ProfileOwnerWithWidgets['widgets'][number];
   w: number;
   h: number;
 }
@@ -55,4 +55,11 @@ export interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   profile: ProfileOwnerWithWidgets;
+}
+
+export interface LikeButtonProps {
+  widgetId: string;
+  profileUsername: string;
+  initialLikes: number;
+  initialIsLiked: boolean;
 }

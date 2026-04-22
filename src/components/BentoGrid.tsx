@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { updateWidgetsLayout, deleteWidget } from '@/actions/widget';
 import WidgetRenderer from './widgets/WidgetRenderer';
+import LikeButton from './widgets/LikeButton';
 import type { Layouts, WidgetLayoutData, BentoGridProps, Layout } from '@/types';
 import { toast } from 'sonner';
 
@@ -24,7 +25,13 @@ function getStableLayoutString(layouts: Layouts): string {
   return JSON.stringify(stable);
 }
 
-export default function BentoGrid({ initialWidgets, isOwner, isEditing, username, onEditWidget }: BentoGridProps) {
+export default function BentoGrid({
+  initialWidgets,
+  isOwner,
+  isEditing,
+  username,
+  onEditWidget,
+}: BentoGridProps) {
   const [layouts, setLayouts] = useState<Layouts>(() => {
     const initialLayouts: Layouts = {};
 
@@ -138,6 +145,13 @@ export default function BentoGrid({ initialWidgets, isOwner, isEditing, username
             )}
 
             <WidgetRenderer widget={widget} w={w} h={h} />
+
+            <LikeButton
+              widgetId={widget.id}
+              profileUsername={username}
+              initialLikes={widget._count?.likes ?? 0}
+              initialIsLiked={(widget.likes?.length ?? 0) > 0}
+            />
           </div>
         );
       })}
